@@ -1,4 +1,14 @@
-// Admin Dashboard Logic (Clean Slate - No Demo Data)
+// Admin Dashboard Logic
+
+const DEFAULT_CATEGORIES = [
+    { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
+    { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
+    { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
+];
+
+if (!localStorage.getItem('yasmine_categories')) {
+    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadAdminStats();
@@ -41,7 +51,7 @@ function switchTab(tabId) {
 
 // Load Stats
 function loadAdminStats() {
-    const visitors = localStorage.getItem('yasmine_visitors') || '1042';
+    const visitors = localStorage.getItem('yasmine_visitors') || '0';
     const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
     const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
 
@@ -243,6 +253,7 @@ function editCategory(id) {
     const cat = categories.find(c => c.id === id);
     if (!cat) return;
 
+    document.getElementById('category-original-id').value.trim = cat.id; // wait, let's keep it simple: .value = cat.id
     document.getElementById('category-original-id').value = cat.id;
     document.getElementById('category-id').value = cat.id;
     document.getElementById('category-id').disabled = true; // Don't change slug easily
@@ -309,10 +320,8 @@ function deleteCategory(id) {
 
 // Reset Store Data
 function resetStoreData() {
-    if (!confirm('هل تريد مسح جميع بيانات المتجر والبدء من الصفر؟')) return;
-    localStorage.removeItem('yasmine_categories');
-    localStorage.removeItem('yasmine_products');
-    localStorage.removeItem('yasmine_cart');
+    if (!confirm('هل تريد استعادة الأقسام الافتراضية؟')) return;
+    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
     location.reload();
 }
 
@@ -323,7 +332,6 @@ function showToast(text) {
     toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${text}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => {
-        toast.print = ''; // dummy
         toast.remove();
     }, 3000);
 }
