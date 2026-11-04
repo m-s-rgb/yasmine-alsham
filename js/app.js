@@ -1,67 +1,9 @@
-// Store Default Data Initialization
-const DEFAULT_CATEGORIES = [
-    { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
-    { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
-    { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
-];
-
-const DEFAULT_PRODUCTS = [
-    {
-        id: 1,
-        name: 'طقم مكياج عرائس متكامل فاخر',
-        category: 'makeup',
-        price: 150000,
-        image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=600&auto=format&fit=crop',
-        description: 'طقم احترافي يحتوي على أحمر شفاه، ظلال عيون بألوان ساحرة، فاونديشن عالي الجودة، وفرش مكياج احترافية.'
-    },
-    {
-        id: 2,
-        name: 'أحمر شفاه مطفي ثابت (مجموعة 6 ألوان)',
-        category: 'makeup',
-        price: 45000,
-        image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=600&auto=format&fit=crop',
-        description: 'أحمر شفاه سائل ثابت يدوم طويلاً، مقاوم للماء وبألوان عصرية تضفي جاذبية مطلقة.'
-    },
-    {
-        id: 3,
-        name: 'فستان سهرة نسائي أنيق مطرز',
-        category: 'women',
-        price: 280000,
-        image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
-        description: 'فستان سهرة راقي بتصميم عصري وأنيق، مصنوع من أجود أنواع الأقمشة ليناسب المناسبات السعيدة.'
-    },
-    {
-        id: 4,
-        name: 'طقم كاجوال نسائي قطعتين صيفي',
-        category: 'women',
-        price: 120000,
-        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
-        description: 'طقم كاجوال مريح وعصري، مناسب للخروج اليومي والجامعة بتصاميم تناسب كافة الأوقات.'
-    },
-    {
-        id: 5,
-        name: 'طقم ملابس أطفال أولادي شتوي',
-        category: 'kids',
-        price: 85000,
-        image: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?q=80&w=600&auto=format&fit=crop',
-        description: 'طقم أولادي دافئ ومريح، مصنوع من القطن الطبيعي الصديق لبشرة الأطفال الحساسة.'
-    },
-    {
-        id: 6,
-        name: 'فستان بناتي كيوت للأعراس والمناسبات',
-        category: 'kids',
-        price: 95000,
-        image: 'https://images.unsplash.com/photo-1621452773781-0f992fd1f5cb?q=80&w=600&auto=format&fit=crop',
-        description: 'فستان بناتي بتصميم الأميرات، مزين بتفاصيل دقيقة وناعمة تمنح طفلتك إطلالة مبهرة.'
-    }
-];
-
-// Initialize Storage if empty
+// Store Data Initialization (Clean Slate - No Demo Data)
 if (!localStorage.getItem('yasmine_categories')) {
-    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+    localStorage.setItem('yasmine_categories', JSON.stringify([]));
 }
 if (!localStorage.getItem('yasmine_products')) {
-    localStorage.setItem('yasmine_products', JSON.stringify(DEFAULT_PRODUCTS));
+    localStorage.setItem('yasmine_products', JSON.stringify([]));
 }
 
 // Visitor Counter Logic
@@ -96,6 +38,16 @@ function renderCategories() {
     const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
     const container = document.getElementById('categories-grid');
     if (!container) return;
+
+    if (categories.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl shadow-sm border border-gray-200">
+                <i class="fa-solid fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                <p class="text-sm font-bold">لا توجد أقسام مضافة حالياً. يجدر بالأدمن إضافة أقسام من لوحة التحكم.</p>
+            </div>
+        `;
+        return;
+    }
 
     container.innerHTML = categories.map(cat => `
         <div onclick="filterCategoryByClick('${cat.id}')" class="group relative bg-gray-900 rounded-2xl overflow-hidden shadow-md cursor-pointer h-64 transform transition hover:-translate-y-1">
@@ -159,9 +111,9 @@ function renderProducts(searchQuery = '') {
 
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="col-span-full py-16 text-center text-gray-400">
+            <div class="col-span-full py-16 text-center text-gray-400 bg-white rounded-2xl shadow-sm border border-gray-200">
                 <i class="fa-solid fa-box-open text-4xl mb-3 text-gray-300"></i>
-                <p class="text-base font-bold">عذراً، لم يتم العثور على منتجات مطابقة.</p>
+                <p class="text-base font-bold">لا توجد منتجات مسجلة حالياً في هذا القسم.</p>
             </div>
         `;
         return;
@@ -187,7 +139,7 @@ function renderProducts(searchQuery = '') {
                         <p class="text-xs text-gray-500 line-clamp-2 mb-4">${product.description || ''}</p>
                     </div>
                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span class="font-black text-brandRed text-base">${product.price.toLocaleString()} ل.س</span>
+                        <span class="font-black text-brandRed text-base">$${parseFloat(product.price).toLocaleString()}</span>
                         <span class="text-xs font-bold text-gray-400 group-hover:text-brandRed flex items-center gap-1 transition">
                             <span>التفاصيل</span>
                             <i class="fa-solid fa-arrow-left text-[10px]"></i>
@@ -221,7 +173,7 @@ function openProductModalDetail(productId) {
             <div>
                 <span class="bg-red-100 text-brandRed text-xs font-bold px-3 py-1 rounded-full">${catName}</span>
                 <h3 class="text-2xl font-black text-brandGray-dark mt-3 mb-2">${product.name}</h3>
-                <p class="text-2xl font-black text-brandRed mb-4">${product.price.toLocaleString()} ل.س</p>
+                <p class="text-2xl font-black text-brandRed mb-4">$${parseFloat(product.price).toLocaleString()}</p>
                 <p class="text-sm text-gray-600 leading-relaxed mb-6">${product.description || 'لا يوجد وصف متاح.'}</p>
             </div>
             <div class="bg-gray-100 p-4 rounded-xl text-center text-xs font-bold text-gray-600">
@@ -230,6 +182,7 @@ function openProductModalDetail(productId) {
         </div>
     `;
 
+    modal.classList.add('hidden'); // Fix toggle bug if any, wait, modal should be flex/hidden
     modal.classList.remove('hidden');
 }
 
