@@ -1,1 +1,239 @@
+// Store Default Data Initialization
+const DEFAULT_CATEGORIES = [
+    { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
+    { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
+    { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
+];
 
+const DEFAULT_PRODUCTS = [
+    {
+        id: 1,
+        name: 'طقم مكياج عرائس متكامل فاخر',
+        category: 'makeup',
+        price: 150000,
+        image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=600&auto=format&fit=crop',
+        description: 'طقم احترافي يحتوي على أحمر شفاه، ظلال عيون بألوان ساحرة، فاونديشن عالي الجودة، وفرش مكياج احترافية.'
+    },
+    {
+        id: 2,
+        name: 'أحمر شفاه مطفي ثابت (مجموعة 6 ألوان)',
+        category: 'makeup',
+        price: 45000,
+        image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=600&auto=format&fit=crop',
+        description: 'أحمر شفاه سائل ثابت يدوم طويلاً، مقاوم للماء وبألوان عصرية تضفي جاذبية مطلقة.'
+    },
+    {
+        id: 3,
+        name: 'فستان سهرة نسائي أنيق مطرز',
+        category: 'women',
+        price: 280000,
+        image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
+        description: 'فستان سهرة راقي بتصميم عصري وأنيق، مصنوع من أجود أنواع الأقمشة ليناسب المناسبات السعيدة.'
+    },
+    {
+        id: 4,
+        name: 'طقم كاجوال نسائي قطعتين صيفي',
+        category: 'women',
+        price: 120000,
+        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
+        description: 'طقم كاجوال مريح وعصري، مناسب للخروج اليومي والجامعة بتصاميم تناسب كافة الأوقات.'
+    },
+    {
+        id: 5,
+        name: 'طقم ملابس أطفال أولادي شتوي',
+        category: 'kids',
+        price: 85000,
+        image: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?q=80&w=600&auto=format&fit=crop',
+        description: 'طقم أولادي دافئ ومريح، مصنوع من القطن الطبيعي الصديق لبشرة الأطفال الحساسة.'
+    },
+    {
+        id: 6,
+        name: 'فستان بناتي كيوت للأعراس والمناسبات',
+        category: 'kids',
+        price: 95000,
+        image: 'https://images.unsplash.com/photo-1621452773781-0f992fd1f5cb?q=80&w=600&auto=format&fit=crop',
+        description: 'فستان بناتي بتصميم الأميرات، مزين بتفاصيل دقيقة وناعمة تمنح طفلتك إطلالة مبهرة.'
+    }
+];
+
+// Initialize Storage if empty
+if (!localStorage.getItem('yasmine_categories')) {
+    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+}
+if (!localStorage.getItem('yasmine_products')) {
+    localStorage.setItem('yasmine_products', JSON.stringify(DEFAULT_PRODUCTS));
+}
+
+// Visitor Counter Logic
+let visitorCount = parseInt(localStorage.getItem('yasmine_visitors') || '1042');
+if (!sessionStorage.getItem('visited_session')) {
+    visitorCount++;
+    localStorage.setItem('yasmine_visitors', visitorCount);
+    sessionStorage.setItem('visited_session', 'true');
+}
+document.getElementById('visitor-count-num').innerText = visitorCount.toLocaleString();
+
+// State
+let currentCategoryFilter = 'all';
+
+// Load Store Data on Startup
+document.addEventListener('DOMContentLoaded', () => {
+    renderCategories();
+    renderCategoryTabs();
+    renderProducts();
+
+    // Search input listener
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderProducts(e.target.value);
+        });
+    }
+});
+
+// Render Categories Grid on Homepage
+function renderCategories() {
+    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+    const container = document.getElementById('categories-grid');
+    if (!container) return;
+
+    container.innerHTML = categories.map(cat => `
+        <div onclick="filterCategoryByClick('${cat.id}')" class="group relative bg-gray-900 rounded-2xl overflow-hidden shadow-md cursor-pointer h-64 transform transition hover:-translate-y-1">
+            <img src="${cat.image}" alt="${cat.name}" class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
+                <h4 class="text-white text-xl font-black mb-1">${cat.name}</h4>
+                <p class="text-brandRed-light text-xs font-bold flex items-center gap-1">
+                    <span>تصفح المنتجات</span>
+                    <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                </p>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Render Category Tabs
+function renderCategoryTabs() {
+    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+    const tabsContainer = document.getElementById('category-tabs');
+    if (!tabsContainer) return;
+
+    let html = `<button onclick="filterCategory('all')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === 'all' ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">الكل</button>`;
+
+    html += categories.map(cat => `
+        <button onclick="filterCategory('${cat.id}')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === cat.id ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">
+            ${cat.name}
+        </button>
+    `).join('');
+
+    tabsContainer.innerHTML = html;
+}
+
+// Filter Category
+function filterCategory(catId) {
+    currentCategoryFilter = catId;
+    renderCategoryTabs();
+    renderProducts();
+}
+
+function filterCategoryByClick(catId) {
+    filterCategory(catId);
+    const section = document.getElementById('products-section');
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Render Products Grid (Browse Only)
+function renderProducts(searchQuery = '') {
+    const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
+    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+    const container = document.getElementById('products-grid');
+    if (!container) return;
+
+    const filtered = products.filter(p => {
+        const matchesCategory = currentCategoryFilter === 'all' || p.category === currentCategoryFilter;
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full py-16 text-center text-gray-400">
+                <i class="fa-solid fa-box-open text-4xl mb-3 text-gray-300"></i>
+                <p class="text-base font-bold">عذراً، لم يتم العثور على منتجات مطابقة.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filtered.map(product => {
+        const catObj = categories.find(c => c.id === product.category);
+        const catName = catObj ? catObj.name : product.category;
+
+        return `
+            <div onclick="openProductModalDetail(${product.id})" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group transform transition hover:-translate-y-1 hover:shadow-xl cursor-pointer">
+                <div class="relative h-56 overflow-hidden bg-gray-100">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute top-3 right-3 bg-brandGray-dark/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                        ${catName}
+                    </span>
+                </div>
+                <div class="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-base text-brandGray-dark group-hover:text-brandRed transition line-clamp-1 mb-2">
+                            ${product.name}
+                        </h4>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-4">${product.description || ''}</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <span class="font-black text-brandRed text-base">${product.price.toLocaleString()} ل.س</span>
+                        <span class="text-xs font-bold text-gray-400 group-hover:text-brandRed flex items-center gap-1 transition">
+                            <span>التفاصيل</span>
+                            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Product Details Modal
+function openProductModalDetail(productId) {
+    const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
+    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    const catObj = categories.find(c => c.id === product.category);
+    const catName = catObj ? catObj.name : product.category;
+
+    const modal = document.getElementById('product-modal');
+    const content = document.getElementById('product-modal-content');
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+        <div class="h-72 md:h-full bg-gray-100">
+            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+        </div>
+        <div class="p-6 md:p-8 flex flex-col justify-between">
+            <div>
+                <span class="bg-red-100 text-brandRed text-xs font-bold px-3 py-1 rounded-full">${catName}</span>
+                <h3 class="text-2xl font-black text-brandGray-dark mt-3 mb-2">${product.name}</h3>
+                <p class="text-2xl font-black text-brandRed mb-4">${product.price.toLocaleString()} ل.س</p>
+                <p class="text-sm text-gray-600 leading-relaxed mb-6">${product.description || 'لا يوجد وصف متاح.'}</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-xl text-center text-xs font-bold text-gray-600">
+                <i class="fa-solid fa-eye text-brandRed ml-1"></i> وضع المعاينة والعرض فقط (غير مخصص للشراء الإلكتروني)
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('product-modal');
+    if (modal) modal.classList.add('hidden');
+}
