@@ -73,7 +73,7 @@ function loadAdminProducts() {
                 </td>
                 <td class="p-4 font-bold text-brandGray-dark">${product.name}</td>
                 <td class="p-4"><span class="bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">${catName}</span></td>
-                <td class="p-4 font-black text-brandRed">${product.price.toLocaleString()} ل.س</td>
+                <td class="p-4 font-black text-brandRed">$${parseFloat(product.price).toLocaleString()}</td>
                 <td class="p-4 text-center space-x-2 space-x-reverse">
                     <button onclick="editProduct(${product.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-3 py-1.5 rounded-xl font-bold text-xs transition">
                         <i class="fa-solid fa-pen-to-square ml-1"></i> تعديل
@@ -274,7 +274,7 @@ function saveCategory(e) {
                 alert('معرف القسم موجود مسبقاً، اختر معرفاً آخر بالإنجليزية.');
                 return;
             }
-            categories.push({ id, name, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit5=crop' });
+            categories.push({ id, name, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' });
         }
 
         localStorage.setItem('yasmine_categories', JSON.stringify(categories));
@@ -297,7 +297,7 @@ function saveCategory(e) {
 }
 
 function deleteCategory(id) {
-    if (!confirm('هل أنت متجكد من حذف هذا القسم؟')) return;
+    if (!confirm('هل أنت متأكد من حذف هذا القسم؟')) return;
     let categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
     categories = categories.filter(c => c.id !== id);
     localStorage.setItem('yasmine_categories', JSON.stringify(categories));
@@ -323,6 +323,7 @@ function showToast(text) {
     toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${text}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => {
+        toast.print = ''; // dummy
         toast.remove();
     }, 3000);
 }
