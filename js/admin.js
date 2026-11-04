@@ -17,11 +17,50 @@ if (storedVisitors > 1000) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadAdminStats();
-    loadAdminProducts();
-    loadAdminCategories();
-    populateCategoryDropdown();
+    checkLoginState();
 });
+
+// Check Login State
+function checkLoginState() {
+    const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+    const loginContainer = document.getElementById('login-container');
+    const adminWrapper = document.getElementById('admin-main-wrapper');
+
+    if (isLoggedIn) {
+        if (loginContainer) loginContainer.classList.add('hidden');
+        if (adminWrapper) adminWrapper.classList.remove('hidden');
+        loadAdminStats();
+        loadAdminProducts();
+        loadAdminCategories();
+        populateCategoryDropdown();
+    } else {
+        if (loginContainer) loginContainer.classList.remove('hidden');
+        if (adminWrapper) adminWrapper.classList.add('hidden');
+    }
+}
+
+// Handle Login Form Submit
+function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value.trim();
+    const errorEl = document.getElementById('login-error');
+
+    // Default credentials: admin / 123
+    if (user === 'admin' && pass === '123') {
+        sessionStorage.setItem('isAdminLoggedIn', 'true');
+        checkLoginState();
+    } else {
+        if (errorEl) errorEl.classList.remove('hidden');
+    }
+}
+
+// Logout Admin
+function logoutAdmin() {
+    if (!confirm('هل تريد تسجيل الخروج من لوحة التحكم؟')) return;
+    sessionStorage.removeItem('isAdminLoggedIn');
+    location.reload();
+}
 
 // Tab Switching
 function switchTab(tabId) {
@@ -45,7 +84,7 @@ function switchTab(tabId) {
     const subtitleEl = document.getElementById('page-subtitle');
     if (tabId === 'dashboard') {
         titleEl.innerText = 'لوحة التحكم والإحصائيات';
-        subtitleEl.innerText = 'مرحباً بك مجدداً، نظرة عامة على نشاط متجر ياسمين الشام';
+        subtitleEl.innerText = 'مرحباً بك مجدداً، إدارة متجر ياسمين الشام';
     } else if (tabId === 'products') {
         titleEl.innerText = 'إدارة المنتجات';
         subtitleEl.innerText = 'إضافة، تعديل وحذف منتجات المكياج والملابس';
@@ -321,7 +360,6 @@ function deleteCategory(id) {
     loadAdminStats();
     loadAdminCategories();
     populateCategoryDropdown();
-    showTouch = false;
     showToast('تم حذف القسم بنجاح');
 }
 
