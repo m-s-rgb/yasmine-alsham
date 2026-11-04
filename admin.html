@@ -51,14 +51,14 @@
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">اسم المستخدم (Username)</label>
-                    <input type="text" id="login-user" required placeholder="admin" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandRed">
+                    <input type="text" id="login-user" required placeholder="أدخل اسم المستخدم" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandRed">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">كلمة المرور (Password)</label>
                     <input type="password" id="login-pass" required placeholder="••••••" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brandRed">
                 </div>
                 <div id="login-error" class="text-xs text-brandRed font-bold text-center hidden">
-                    اسم المستخدم أو كلمة المرور غير صحيحة! (الافتراضي: admin / 123)
+                    اسم المستخدم أو كلمة المرور غير صحيحة!
                 </div>
                 <button type="submit" class="w-full bg-brandRed hover:bg-brandRed-dark text-white font-bold py-3.5 rounded-xl shadow-lg transition text-sm">
                     تسجيل الدخول
@@ -69,9 +69,6 @@
                 <a href="index.html" class="text-xs text-gray-500 hover:text-brandRed transition font-semibold">
                     <i class="fa-solid fa-arrow-right ml-1"></i> العودة إلى واجهة المتجر
                 </a>
-            </div>
-            <div class="mt-4 text-center text-[11px] text-gray-400 bg-gray-50 p-2.5 rounded-xl">
-                بيانات الدخول الافتراضية:<br>اسم المستخدم: <span class="font-bold text-gray-700">admin</span> | كلمة المرور: <span class="font-bold text-gray-700">123</span>
             </div>
         </div>
     </div>
@@ -106,6 +103,10 @@
                     <button onclick="switchTab('categories')" id="nav-categories" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
                         <i class="fa-solid fa-tags text-lg"></i>
                         <span>إدارة الأقسام والصور</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+                        <i class="fa-solid fa-gears text-lg"></i>
+                        <span>إعدادات المتجر والعنوان</span>
                     </button>
                 </nav>
             </div>
@@ -240,6 +241,32 @@
 
                 <div id="admin-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Dynamic category cards -->
+                </div>
+            </div>
+
+            <!-- Tab 4: Store Settings (Contact Info & Address) -->
+            <div id="tab-settings" class="tab-content hidden space-y-6">
+                <h3 class="text-xl font-black text-brandGray-dark">إعدادات المتجر وبيانات التواصل والعنوان</h3>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 max-w-2xl">
+                    <form id="settings-form" onsubmit="saveStoreSettings(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اسم المتجر</label>
+                            <input type="text" id="setting-store-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهاتف</label>
+                            <input type="text" id="setting-store-phone" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">العنوان (المدينة / المنطقة)</label>
+                            <input type="text" id="setting-store-address" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="bg-brandRed hover:bg-brandRed-dark text-white font-bold px-6 py-3 rounded-xl shadow transition text-xs">
+                                حفظ التعديلات وتحديث المتجر
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
