@@ -253,7 +253,6 @@ function editCategory(id) {
     const cat = categories.find(c => c.id === id);
     if (!cat) return;
 
-    document.getElementById('category-original-id').value.trim = cat.id; // wait, let's keep it simple: .value = cat.id
     document.getElementById('category-original-id').value = cat.id;
     document.getElementById('category-id').value = cat.id;
     document.getElementById('category-id').disabled = true; // Don't change slug easily
@@ -270,7 +269,7 @@ function saveCategory(e) {
     const originalId = document.getElementById('category-original-id').value;
     const id = document.getElementById('category-id').value.trim().toLowerCase();
     const name = document.getElementById('category-name').value;
-    const existingImage = document.getElementById('category-image-existing').value;
+    const existingImage = document.getElementById('category-image-external') ? '' : document.getElementById('category-image-existing').value;
     const imageFile = document.getElementById('category-image-file').files[0];
 
     let categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
@@ -318,10 +317,12 @@ function deleteCategory(id) {
     showToast('تم حذف القسم بنجاح');
 }
 
-// Reset Store Data
+// Reset Store Data (Wipe and Reset Visitor Counter to 0)
 function resetStoreData() {
-    if (!confirm('هل تريد استعادة الأقسام الافتراضية؟')) return;
+    if (!confirm('هل تريد إعادة تعيين المتجر وتصفير العداد؟')) return;
+    localStorage.clear();
     localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+    localStorage.setItem('yasmine_visitors', '0');
     location.reload();
 }
 
