@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ياسمين الشام - للمكياج وملابس الأطفال والنسائية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: {
+                            DEFAULT: '#DC2626',
+                            dark: '#991B1B',
+                            light: '#EF4444',
+                        },
+                        brandGray: {
+                            dark: '#111827',
+                            card: '#1F2937',
+                            light: '#F3F4F6',
+                            text: '#4B5563'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Top Bar -->
+    <div class="bg-brandGray-dark text-white text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <span><i class="fa-solid fa-phone text-brandRed-light ml-1"></i> +963 900 000 000</span>
+                <span><i class="fa-solid fa-envelope text-brandRed-light ml-1"></i> info@yasmine-alsham.com</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="visitor-counter" class="bg-brandRed text-white px-2.5 py-0.5 rounded-full text-xs font-bold">
+                    <i class="fa-solid fa-eye ml-1"></i> الزوار: <span id="visitor-count-num">1</span>
+                </span>
+                <a href="admin.html" class="hover:text-brandRed-light transition font-semibold">
+                    <i class="fa-solid fa-lock ml-1"></i> لوحة التحكم (الإدارة)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="bg-brandRed text-white w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">
+                    ي
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-brandGray-dark tracking-wide">ياسمين الشام</h1>
+                    <p class="text-xs text-gray-500 font-semibold">مكياج • ملابس نسائية • ملابس أطفال</p>
+                </div>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+                <div class="relative w-full">
+                    <input type="text" id="search-input" placeholder="ابحث عن منتج، مكياج، ملابس..."
+                        class="w-full bg-gray-100 border border-gray-300 rounded-full py-2 pr-10 pl-4 text-sm focus:outline-none focus:border-brandRed transition">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Browse Mode Indicator -->
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl text-xs font-bold text-gray-700">
+                <i class="fa-solid fa-eye text-brandRed"></i>
+                <span>معرض عرض فقط</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-brandGray-dark via-gray-800 to-brandRed-dark text-white py-16 px-4 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
+            <div>
+                <span class="bg-brandRed text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">تشكيلة موسم 2026</span>
+                <h2 class="text-4xl md:text-5xl font-black mt-4 mb-4 leading-tight">أناقتك وعائلتك تبدأ من <span class="text-brandRed-light">ياسمين الشام</span></h2>
+                <p class="text-gray-300 text-base mb-8">اكتشفي أحدث صيحات المكياج العالمي، وأجمل موديلات الملابس النسائية وملابس الأطفال الراقيّة بجودة عالية وأسعار منافسة.</p>
+                <a href="#products-section" class="bg-brandRed hover:bg-brandRed-dark text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition inline-flex items-center gap-2">
+                    <span>تصفح المنتجات الآن</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+            </div>
+            <div class="hidden md:flex justify-center">
+                <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center">
+                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-brandRed-light mb-2"></i>
+                        <h3 class="font-bold text-lg">مكياج أصلي</h3>
+                        <p class="text-xs text-gray-300 mt-1">أرقى ماركات التجميل</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center">
+                        <i class="fa-solid fa-child-reaching text-3xl text-brandRed-light mb-2"></i>
+                        <h3 class="font-bold text-lg">ملابس أطفال</h3>
+                        <p class="text-xs text-gray-300 mt-1">تشكيلة مريحة وعصرية</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 text-center col-span-2">
+                        <i class="fa-solid fa-shirt text-3xl text-brandRed-light mb-2"></i>
+                        <h3 class="font-bold text-lg">ملابس نسائية راقية</h3>
+                        <p class="text-xs text-gray-300 mt-1">تصاميم تناسب كافة المناسبات والأوقات</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="max-w-7xl mx-auto px-4 py-12 w-full">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="text-2xl font-black text-brandGray-dark">أقسام المتجر</h3>
+                <p class="text-xs text-gray-500 mt-1">تصفح المنتجات حسب القسم المفضل لديك</p>
+            </div>
+        </div>
+
+        <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Categories loaded via JS -->
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products-section" class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h3 class="text-2xl font-black text-brandGray-dark">معرض المنتجات (عرض فقط)</h3>
+                <p class="text-xs text-gray-500 mt-1">اضغط على أي منتج لمشاهدة التفاصيل الكاملة</p>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div id="category-tabs" class="flex flex-wrap gap-2">
+                <button onclick="filterCategory('all')" class="category-tab active px-4 py-2 rounded-xl text-xs font-bold bg-brandRed text-white transition shadow">
+                    الكل
+                </button>
+                <!-- Dynamic tabs -->
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Products loaded via JS -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brandGray-dark text-white mt-16 py-12 px-4 border-t-4 border-brandRed">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-brandRed text-white w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg">
+                        ي
+                    </div>
+                    <h3 class="text-xl font-black tracking-wide">ياسمين الشام</h3>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    وجهتكم الأولى للمكياج الأصلي والملابس النسائية وملابس الأطفال. نضمن لكم الجودة والأناقة في كل قطعة.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brandRed-light border-b border-gray-800 pb-2">روابط سريعة</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="index.html" class="hover:text-white transition">الرئيسية</a></li>
+                    <li><a href="#products-section" class="hover:text-white transition">المنتجات</a></li>
+                    <li><a href="admin.html" class="hover:text-brandRed-light transition">لوحة تحكم الأدمن</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brandRed-light border-b border-gray-800 pb-2">تواصل معنا</h4>
+                <p class="text-sm text-gray-400 mb-2"><i class="fa-solid fa-location-dot ml-2 text-brandRed"></i> سوريا - الشام / دمشق</p>
+                <p class="text-sm text-gray-400 mb-2"><i class="fa-solid fa-phone ml-2 text-brandRed"></i> +963 900 000 000</p>
+                <p class="text-sm text-gray-400"><i class="fa-solid fa-envelope ml-2 text-brandRed"></i> support@yasmine-alsham.com</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto text-center pt-8 border-t border-gray-800 text-xs text-gray-500">
+            جميع الحقوق محفوظة &copy; 2026 متجر ياسمين الشام
+        </div>
+    </footer>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 bg-gray-100 hover:bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-700 z-10 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="product-modal-content" class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript App Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>

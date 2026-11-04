@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - ياسمين الشام (Admin Dashboard)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: {
+                            DEFAULT: '#DC2626',
+                            dark: '#991B1B',
+                            light: '#EF4444',
+                        },
+                        brandGray: {
+                            dark: '#111827',
+                            card: '#1F2937',
+                            light: '#F3F4F6',
+                            text: '#4B5563'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col md:flex-row">
+
+    <!-- Sidebar (Admin Navigation) -->
+    <aside class="w-full md:w-72 bg-brandGray-dark text-white flex flex-col justify-between shadow-2xl">
+        <div>
+            <!-- Sidebar Header -->
+            <div class="p-6 border-b border-gray-800 flex items-center gap-3">
+                <div class="bg-brandRed text-white w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl shadow">
+                    ش
+                </div>
+                <div>
+                    <h1 class="text-lg font-black tracking-wide">ياسمين الشام</h1>
+                    <p class="text-xs text-brandRed-light font-bold">لوحة التحكم المركزية</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-brandRed text-white transition shadow">
+                    <i class="fa-solid fa-chart-pie text-lg"></i>
+                    <span>الرئيسية والإحصائيات</span>
+                </button>
+                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+                    <i class="fa-solid fa-box-open text-lg"></i>
+                    <span>إدارة المنتجات</span>
+                </button>
+                <button onclick="switchTab('categories')" id="nav-categories" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
+                    <i class="fa-solid fa-tags text-lg"></i>
+                    <span>إدارة الأقسام والصور</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer / Store Link -->
+        <div class="p-4 border-t border-gray-800">
+            <a href="index.html" target="_blank" class="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 py-2.5 rounded-xl text-xs font-bold transition">
+                <i class="fa-solid fa-store"></i>
+                <span>عرض المتجر (واجهة العميل)</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Admin Content -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+            <div>
+                <h2 id="page-title" class="text-2xl md:text-3xl font-black text-brandGray-dark">لوحة التحكم والإحصائيات</h2>
+                <p id="page-subtitle" class="text-xs text-gray-500 mt-1">مرحباً بك مجدداً، إدارة متجر ياسمين الشام</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="resetStoreData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-rotate-right ml-1"></i> إعادة تعيين بيانات تجريبية
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Dashboard Statistics -->
+        <div id="tab-dashboard" class="tab-content space-y-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-red-100 text-brandRed rounded-2xl flex items-center justify-center text-2xl font-bold">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold">إجمالي زوار المتجر</p>
+                        <h3 id="stat-visitors" class="text-3xl font-black text-brandGray-dark mt-1">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold">إجمالي المنتجات</p>
+                        <h3 id="stat-products" class="text-3xl font-black text-brandGray-dark mt-1">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold">أقسام المتجر</p>
+                        <h3 id="stat-categories" class="text-3xl font-black text-brandGray-dark mt-1">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-bold">حالة المتجر</p>
+                        <h3 class="text-lg font-black text-emerald-600 mt-2">يعمل بكفاءة</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Cards -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-black text-brandGray-dark mb-4">إجراءات سريعة</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="openProductModal()" class="p-4 bg-brandRed hover:bg-brandRed-dark text-white rounded-xl font-bold flex items-center justify-center gap-2 transition shadow">
+                        <i class="fa-solid fa-plus-circle text-lg"></i>
+                        <span>إضافة منتج جديد مع صورة من جهازك</span>
+                    </button>
+                    <button onclick="openCategoryModal()" class="p-4 bg-brandGray-dark hover:bg-gray-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition shadow">
+                        <i class="fa-solid fa-folder-plus text-lg"></i>
+                        <span>إضافة قسم جديد مع صورة من جهازك</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Products Management -->
+        <div id="tab-products" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-black text-brandGray-dark">قائمة المنتجات</h3>
+                <button onclick="openProductModal()" class="bg-brandRed hover:bg-brandRed-dark text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition shadow">
+                    <i class="fa-solid fa-plus"></i> إضافة منتج جديد
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500">
+                                <th class="p-4">الصورة</th>
+                                <th class="p-4">اسم المنتج</th>
+                                <th class="p-4">القسم</th>
+                                <th class="p-4">السعر</th>
+                                <th class="p-4 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-products-table" class="divide-y divide-gray-100 text-sm">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Categories Management -->
+        <div id="tab-categories" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-black text-brandGray-dark">قائمة الأقسام وصورها</h3>
+                <button onclick="openCategoryModal()" class="bg-brandRed hover:bg-brandRed-dark text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition shadow">
+                    <i class="fa-solid fa-plus"></i> إضافة قسم جديد
+                </button>
+            </div>
+
+            <div id="admin-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic category cards -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Product Modal (Add/Edit) -->
+    <div id="product-admin-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <h3 id="product-modal-title" class="text-xl font-black text-brandGray-dark mb-4">إضافة منتج جديد</h3>
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4">
+                <input type="hidden" id="product-id">
+                <input type="hidden" id="product-image-existing">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">اسم المنتج</label>
+                    <input type="text" id="product-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">القسم</label>
+                    <select id="product-category" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                        <!-- Options loaded dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">السعر (ل.س)</label>
+                    <input type="number" id="product-price" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (اختر صورة من جهازك)</label>
+                    <input type="file" id="product-image-file" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brandRed file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brandRed file:text-white hover:file:bg-brandRed-dark">
+                    <p class="text-[11px] text-gray-400 mt-1">يمكنك رفع صورة مباشرة من الكمبيوتر أو الهاتف.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">وصف المنتج</label>
+                    <textarea id="product-desc" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeProductAdminModal()" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition">إلغاء</button>
+                    <button type="submit" class="px-5 py-2.5 bg-brandRed hover:bg-brandRed-dark text-white rounded-xl text-xs font-bold transition shadow">حفظ المنتج</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal (Add/Edit) -->
+    <div id="category-admin-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <h3 id="category-modal-title" class="text-xl font-black text-brandGray-dark mb-4">إضافة قسم جديد</h3>
+            <form id="category-form" onsubmit="saveCategory(event)" class="space-y-4">
+                <input type="hidden" id="category-original-id">
+                <input type="hidden" id="category-image-existing">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">معرف القسم (Slug بالإنجليزية مثل makeup)</label>
+                    <input type="text" id="category-id" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">اسم القسم بالعربية</label>
+                    <input type="text" id="category-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">صورة القسم (اختر صورة من جهازك)</label>
+                    <input type="file" id="category-image-file" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brandRed file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brandRed file:text-white hover:file:bg-brandRed-dark">
+                    <p class="text-[11px] text-gray-400 mt-1">اختر صورة معبرة للقسم من جهازك.</p>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeCategoryAdminModal()" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition">إلغاء</button>
+                    <button type="submit" class="px-5 py-2.5 bg-brandRed hover:bg-brandRed-dark text-white rounded-xl text-xs font-bold transition shadow">حفظ القسم</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Admin Logic -->
+    <script src="js/admin.js"></script>
+</body>
+</html>
