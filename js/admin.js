@@ -10,6 +10,12 @@ if (!localStorage.getItem('yasmine_categories')) {
     localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
 }
 
+// Clean up any legacy default visitor numbers > 1000
+let storedVisitors = parseInt(localStorage.getItem('yasmine_visitors') || '0');
+if (storedVisitors > 1000) {
+    localStorage.setItem('yasmine_visitors', '0');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadAdminStats();
     loadAdminProducts();
@@ -51,11 +57,12 @@ function switchTab(tabId) {
 
 // Load Stats
 function loadAdminStats() {
-    const visitors = localStorage.getItem('yasmine_visitors') || '0';
+    let visitors = parseInt(localStorage.getItem('yasmine_visitors') || '0');
+    if (visitors > 1000) visitors = 0;
     const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
     const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
 
-    document.getElementById('stat-visitors').innerText = parseInt(visitors).toLocaleString();
+    document.getElementById('stat-visitors').innerText = visitors.toLocaleString();
     document.getElementById('stat-products').innerText = products.length;
     document.getElementById('stat-categories').innerText = categories.length;
 }
@@ -269,7 +276,7 @@ function saveCategory(e) {
     const originalId = document.getElementById('category-original-id').value;
     const id = document.getElementById('category-id').value.trim().toLowerCase();
     const name = document.getElementById('category-name').value;
-    const existingImage = document.getElementById('category-image-external') ? '' : document.getElementById('category-image-existing').value;
+    const existingImage = document.getElementById('category-image-existing').value;
     const imageFile = document.getElementById('category-image-file').files[0];
 
     let categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
@@ -314,10 +321,11 @@ function deleteCategory(id) {
     loadAdminStats();
     loadAdminCategories();
     populateCategoryDropdown();
+    showTouch = false;
     showToast('تم حذف القسم بنجاح');
 }
 
-// Reset Store Data (Wipe and Reset Visitor Counter to 0)
+// Reset Store Data
 function resetStoreData() {
     if (!confirm('هل تريد إعادة تعيين المتجر وتصفير العداد؟')) return;
     localStorage.clear();
