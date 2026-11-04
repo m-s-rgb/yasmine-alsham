@@ -1,13 +1,19 @@
-// Store Data Initialization (Clean Slate - No Demo Data)
+// Default Categories (Real & Deletable/Editable from Dashboard)
+const DEFAULT_CATEGORIES = [
+    { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
+    { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
+    { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
+];
+
 if (!localStorage.getItem('yasmine_categories')) {
-    localStorage.setItem('yasmine_categories', JSON.stringify([]));
+    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
 }
 if (!localStorage.getItem('yasmine_products')) {
     localStorage.setItem('yasmine_products', JSON.stringify([]));
 }
 
 // Visitor Counter Logic
-let visitorCount = parseInt(localStorage.getItem('yasmine_visitors') || '1042');
+let visitorCount = parseInt(localStorage.getItem('yasmine_visitors') || '0');
 if (!sessionStorage.getItem('visited_session')) {
     visitorCount++;
     localStorage.setItem('yasmine_visitors', visitorCount);
@@ -43,7 +49,7 @@ function renderCategories() {
         container.innerHTML = `
             <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl shadow-sm border border-gray-200">
                 <i class="fa-solid fa-folder-open text-4xl mb-3 text-gray-300"></i>
-                <p class="text-sm font-bold">لا توجد أقسام مضافة حالياً. يجدر بالأدمن إضافة أقسام من لوحة التحكم.</p>
+                <p class="text-sm font-bold">لا توجد أقسام مضافة حالياً.</p>
             </div>
         `;
         return;
@@ -182,7 +188,6 @@ function openProductModalDetail(productId) {
         </div>
     `;
 
-    modal.classList.add('hidden'); // Fix toggle bug if any, wait, modal should be flex/hidden
     modal.classList.remove('hidden');
 }
 
