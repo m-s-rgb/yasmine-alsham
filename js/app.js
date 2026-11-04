@@ -1,15 +1,24 @@
-// Default Categories (Real & Deletable/Editable from Dashboard)
+// Default Categories & Store Settings
 const DEFAULT_CATEGORIES = [
     { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
     { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
     { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
 ];
 
+const DEFAULT_SETTINGS = {
+    name: 'ياسمين الشام',
+    phone: '+963 980 980 165',
+    address: 'سوريا - درعا / الكرك الشرقي'
+};
+
 if (!localStorage.getItem('yasmine_categories')) {
     localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
 }
 if (!localStorage.getItem('yasmine_products')) {
     localStorage.setItem('yasmine_products', JSON.stringify([]));
+}
+if (!localStorage.getItem('yasmine_store_settings')) {
+    localStorage.setItem('yasmine_store_settings', JSON.stringify(DEFAULT_SETTINGS));
 }
 
 // Visitor Counter Logic (Clean & Real - Flush any legacy default > 1000)
@@ -23,14 +32,13 @@ if (!sessionStorage.getItem('visited_session')) {
     localStorage.setItem('yasmine_visitors', visitorCount);
     sessionStorage.setItem('visited_session', 'true');
 }
-const visitorEl = document.getElementById('visitor-count-num');
-if (visitorEl) visitorEl.innerText = visitorCount.toLocaleString();
 
 // State
 let currentCategoryFilter = 'all';
 
 // Load Store Data on Startup
 document.addEventListener('DOMContentLoaded', () => {
+    applyStoreSettings();
     renderCategories();
     renderCategoryTabs();
     renderProducts();
@@ -43,6 +51,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Apply Store Dynamic Settings (Name, Phone, Address)
+function applyStoreSettings() {
+    const settings = JSON.parse(localStorage.getItem('yasmine_store_settings') || JSON.stringify(DEFAULT_SETTINGS));
+
+    const phoneTop = document.getElementById('store-phone-top');
+    const phoneFooter = document.getElementById('store-phone-footer');
+    const storeNameHeader = document.getElementById('store-name-header');
+    const storeNameHero = document.getElementById('store-name-hero');
+    const storeNameFooter = document.getElementById('store-name-footer');
+    const storeNameCopy = document.getElementById('store-name-copy');
+    const storeAddress = document.getElementById('store-address');
+
+    if (phoneTop) phoneTop.innerText = settings.phone;
+    if (phoneFooter) phoneFooter.innerText = settings.phone;
+    if (storeNameHeader) storeNameHeader.innerText = settings.name;
+    if (storeNameHero) storeNameHero.innerText = settings.name;
+    if (storeNameFooter) storeNameFooter.innerText = settings.name;
+    if (storeNameCopy) storeNameCopy.innerText = settings.name;
+    if (storeAddress) storeAddress.innerText = settings.address;
+}
 
 // Render Categories Grid on Homepage
 function renderCategories() {
@@ -188,7 +217,7 @@ function openProductModalDetail(productId) {
                 <p class="text-sm text-gray-600 leading-relaxed mb-6">${product.description || 'لا يوجد وصف متاح.'}</p>
             </div>
             <div class="bg-gray-100 p-4 rounded-xl text-center text-xs font-bold text-gray-600">
-                <i class="fa-solid fa-eye text-brandRed ml-1"></i> وضع المعاينة والعرض فقط (غير مخصص للشراء الإلكتروني)
+                <i class="fa-solid fa-eye text-brandRed ml-1"></i> تفاصيل المنتج
             </div>
         </div>
     `;
