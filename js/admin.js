@@ -6,8 +6,17 @@ const DEFAULT_CATEGORIES = [
     { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
 ];
 
+const DEFAULT_SETTINGS = {
+    name: 'ياسمين الشام',
+    phone: '+963 980 980 165',
+    address: 'سوريا - درعا / الكرك الشرقي'
+};
+
 if (!localStorage.getItem('yasmine_categories')) {
     localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+}
+if (!localStorage.getItem('yasmine_store_settings')) {
+    localStorage.setItem('yasmine_store_settings', JSON.stringify(DEFAULT_SETTINGS));
 }
 
 // Clean up any legacy default visitor numbers > 1000
@@ -32,6 +41,7 @@ function checkLoginState() {
         loadAdminStats();
         loadAdminProducts();
         loadAdminCategories();
+        loadStoreSettingsForm();
         populateCategoryDropdown();
     } else {
         if (loginContainer) loginContainer.classList.remove('hidden');
@@ -91,7 +101,35 @@ function switchTab(tabId) {
     } else if (tabId === 'categories') {
         titleEl.innerText = 'إدارة الأقسام';
         subtitleEl.innerText = 'إضافة وتعديل أقسام المتجر وصورها البصرية';
+    } else if (tabId === 'settings') {
+        titleEl.innerText = 'إعدادات المتجر والعنوان';
+        subtitleEl.innerText = 'تعديل بيانات التواصل واسم المتجر والعنوان';
+        loadStoreSettingsForm();
     }
+}
+
+// Load Store Settings into Form
+function loadStoreSettingsForm() {
+    const settings = JSON.parse(localStorage.getItem('yasmine_store_settings') || JSON.stringify(DEFAULT_SETTINGS));
+    const nameInput = document.getElementById('setting-store-name');
+    const phoneInput = document.getElementById('setting-store-phone');
+    const addressInput = document.getElementById('setting-store-address');
+
+    if (nameInput) nameInput.value = settings.name;
+    if (phoneInput) phoneInput.value = settings.phone;
+    if (addressInput) addressInput.value = settings.address;
+}
+
+// Save Store Settings
+function saveStoreSettings(e) {
+    e.preventDefault();
+    const name = document.getElementById('setting-store-name').value;
+    const phone = document.getElementById('setting-store-phone').value;
+    const address = document.getElementById('setting-store-address').value;
+
+    const settings = { name, phone, address };
+    localStorage.setItem('yasmine_store_settings', JSON.stringify(settings));
+    showToast('تم حفظ إعدادات المتجر وتحديث البيانات بنجاح');
 }
 
 // Load Stats
@@ -368,6 +406,7 @@ function resetStoreData() {
     if (!confirm('هل تريد إعادة تعيين المتجر وتصفير العداد؟')) return;
     localStorage.clear();
     localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
+    localStorage.setItem('yasmine_store_settings', JSON.stringify(DEFAULT_SETTINGS));
     localStorage.setItem('yasmine_visitors', '0');
     location.reload();
 }
