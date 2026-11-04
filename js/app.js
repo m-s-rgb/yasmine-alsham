@@ -12,14 +12,19 @@ if (!localStorage.getItem('yasmine_products')) {
     localStorage.setItem('yasmine_products', JSON.stringify([]));
 }
 
-// Visitor Counter Logic
+// Visitor Counter Logic (Clean & Real - Flush any legacy default > 1000)
 let visitorCount = parseInt(localStorage.getItem('yasmine_visitors') || '0');
+if (visitorCount > 1000) {
+    visitorCount = 1;
+    localStorage.setItem('yasmine_visitors', visitorCount);
+}
 if (!sessionStorage.getItem('visited_session')) {
     visitorCount++;
     localStorage.setItem('yasmine_visitors', visitorCount);
     sessionStorage.setItem('visited_session', 'true');
 }
-document.getElementById('visitor-count-num').innerText = visitorCount.toLocaleString();
+const visitorEl = document.getElementById('visitor-count-num');
+if (visitorEl) visitorEl.innerText = visitorCount.toLocaleString();
 
 // State
 let currentCategoryFilter = 'all';
