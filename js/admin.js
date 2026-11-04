@@ -1,4 +1,4 @@
-// Admin Dashboard Logic
+// Admin Dashboard Logic (Clean Slate - No Demo Data)
 
 document.addEventListener('DOMContentLoaded', () => {
     loadAdminStats();
@@ -58,7 +58,7 @@ function loadAdminProducts() {
     if (!tbody) return;
 
     if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400">لا توجد منتجات مسجلة حالياً.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400">لا توجد منتجات مسجلة حالياً. استخدم زر "إضافة منتج جديد".</td></tr>`;
         return;
     }
 
@@ -94,7 +94,7 @@ function loadAdminCategories() {
     if (!container) return;
 
     if (categories.length === 0) {
-        container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">لا توجد أقسام مسجلة حالياً.</p>`;
+        container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8 bg-white rounded-2xl border border-gray-200">لا توجد أقسام مسجلة حالياً. أضف أقساماً جديدة ليراها العملاء.</p>`;
         return;
     }
 
@@ -127,6 +127,11 @@ function populateCategoryDropdown() {
     const select = document.getElementById('product-category');
     if (!select) return;
 
+    if (categories.length === 0) {
+        select.innerHTML = `<option value="">-- يرجى إضافة قسم أولاً --</option>`;
+        return;
+    }
+
     select.innerHTML = categories.map(cat => `
         <option value="${cat.id}">${cat.name}</option>
     `).join('');
@@ -134,6 +139,13 @@ function populateCategoryDropdown() {
 
 // Product Modal Operations
 function openProductModal() {
+    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+    if (categories.length === 0) {
+        alert('يجب إضافة قسم واحد على الأقل قبل إضافة المنتجات.');
+        switchTab('categories');
+        return;
+    }
+
     document.getElementById('product-form').reset();
     document.getElementById('product-id').value = '';
     document.getElementById('product-image-existing').value = '';
@@ -262,7 +274,7 @@ function saveCategory(e) {
                 alert('معرف القسم موجود مسبقاً، اختر معرفاً آخر بالإنجليزية.');
                 return;
             }
-            categories.push({ id, name, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' });
+            categories.push({ id, name, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit5=crop' });
         }
 
         localStorage.setItem('yasmine_categories', JSON.stringify(categories));
@@ -285,7 +297,7 @@ function saveCategory(e) {
 }
 
 function deleteCategory(id) {
-    if (!confirm('هل أنت متأكد من حذف هذا القسم؟ (قد يؤثر ذلك على المنتجات التابعة له)')) return;
+    if (!confirm('هل أنت متجكد من حذف هذا القسم؟')) return;
     let categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
     categories = categories.filter(c => c.id !== id);
     localStorage.setItem('yasmine_categories', JSON.stringify(categories));
@@ -297,7 +309,7 @@ function deleteCategory(id) {
 
 // Reset Store Data
 function resetStoreData() {
-    if (!confirm('هل تريد إعادة تعيين المتجر واستعادة البيانات الافتراضية؟')) return;
+    if (!confirm('هل تريد مسح جميع بيانات المتجر والبدء من الصفر؟')) return;
     localStorage.removeItem('yasmine_categories');
     localStorage.removeItem('yasmine_products');
     localStorage.removeItem('yasmine_cart');
