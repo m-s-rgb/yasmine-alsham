@@ -106,7 +106,7 @@
                     </button>
                     <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition">
                         <i class="fa-solid fa-gears text-lg"></i>
-                        <span>إعدادات المتجر والعنوان</span>
+                        <span>إعدادات المتجر والتحديث</span>
                     </button>
                 </nav>
             </div>
@@ -240,11 +240,14 @@
                 </div>
             </div>
 
-            <!-- Tab 4: Store Settings (Contact Info & Address) -->
+            <!-- Tab 4: Store Settings (Contact Info & Address & Export app.js) -->
             <div id="tab-settings" class="tab-content hidden space-y-6">
-                <h3 class="text-xl font-black text-brandGray-dark">إعدادات المتجر وبيانات التواصل والعنوان</h3>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 max-w-2xl">
+                <h3 class="text-xl font-black text-brandGray-dark">إعدادات المتجر وتحديث موقع العميل</h3>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 max-w-2xl space-y-8">
+
+                    <!-- Settings Form -->
                     <form id="settings-form" onsubmit="saveStoreSettings(event)" class="space-y-4">
+                        <h4 class="font-bold text-base text-brandGray-dark border-b pb-2">بيانات التواصل والعنوان</h4>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">اسم المتجر</label>
                             <input type="text" id="setting-store-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
@@ -257,12 +260,25 @@
                             <label class="block text-xs font-bold text-gray-700 mb-1">العنوان (المدينة / المنطقة)</label>
                             <input type="text" id="setting-store-address" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brandRed">
                         </div>
-                        <div class="pt-4">
+                        <div class="pt-2">
                             <button type="submit" class="bg-brandRed hover:bg-brandRed-dark text-white font-bold px-6 py-3 rounded-xl shadow transition text-xs">
-                                حفظ التعديلات وتحديث المتجر
+                                حفظ بيانات المتجر
                             </button>
                         </div>
                     </form>
+
+                    <!-- Export app.js for GitHub Pages -->
+                    <div class="border-t pt-6 space-y-3">
+                        <h4 class="font-bold text-base text-brandGray-dark">تحديث ونشر التعديلات للجميع</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            بعد إضافة منتجاتك أو تعديلها، اضغط على زر <b>مزامنة البيانات</b> لتنزيل ملف التشغيل المحدث ورفعه إلى جيت هب ليراه جميع الزوار.
+                        </p>
+                        <button onclick="exportAppData()" class="bg-brandGray-dark hover:bg-gray-800 text-white font-bold px-6 py-3 rounded-xl shadow transition text-xs flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span>مزامنة البيانات</span>
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
