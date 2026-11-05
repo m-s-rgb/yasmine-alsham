@@ -43,15 +43,22 @@ async function checkLoginState() {
 }
 
 // Handle Login Form Submit
-window.handleLogin = function(e) {
+window.handleLogin = async function(e) {
     if (e) e.preventDefault();
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value.trim();
     const errorEl = document.getElementById('login-error');
 
-    const adminAuth = JSON.parse(localStorage.getItem('yasmine_admin_auth') || '{"user":"admin","pass":"123"}');
+    let settings = adminSettings;
+    if (!settings.adminUser) {
+        settings = await fetchStoreSettings();
+        adminSettings = settings;
+    }
 
-    if ((user === adminAuth.user && pass === adminAuth.pass) || (user === 'admin' && pass === '123')) {
+    const validUser = settings.adminUser || 'admin';
+    const validPass = settings.adminPass || '123';
+
+    if ((user === validUser && pass === validPass) || (user === 'admin' && pass === '123')) {
         sessionStorage.setItem('isAdminLoggedIn', 'true');
         checkLoginState();
     } else {
@@ -317,7 +324,7 @@ window.saveProduct = async function(e) {
         const updated = adminProducts.find(p => p.id == idNum);
         await saveProductToCloud(updated);
     } else {
-        const newId = adminProducts.length > 0 ? Math.max(...adminProducts.map(p => p.id)) + 1 : 1;
+        const newId = Date.now(); // Bulletproof unique ID using timestamp
         const newProd = { id: newId, name, category, price, status, image: imageUrl, description };
         adminProducts.push(newProd);
         await saveProductToCloud(newProd);
@@ -413,11 +420,12 @@ window.deleteCategory = async function(id) {
 
 // Toast Notification
 function showToast(text) {
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-5 left-5 bg-brandGray-dark text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl z-50 animate-bounce flex items-center gap-2';
-    toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${text}</span>`;
-    document.body.appendChild(toast);
+    const toast = method ? null : document.createElement('div'); // safe
+    const div = document.createElement('div');
+    div.className = 'fixed bottom-5 left-5 bg-gray-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl z-50 animate-bounce flex items-center gap-2';
+    div.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${text}</span>`;
+    document.body.appendChild(div);
     setTimeout(() => {
-        toast.remove();
+        div.remove();
     }, 3000);
 }
