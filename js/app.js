@@ -135,7 +135,7 @@ function filterCategoryByClick(catId) {
     }
 }
 
-// Render Products Grid (Browse Only)
+// Render Products Grid (Browse Only - Hiding hidden/sold-out products)
 function renderProducts(searchQuery = '') {
     const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
     const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
@@ -143,6 +143,9 @@ function renderProducts(searchQuery = '') {
     if (!container) return;
 
     const filtered = products.filter(p => {
+        // Skip hidden/finished products for customers
+        if (p.status === 'hidden') return false;
+
         const matchesCategory = currentCategoryFilter === 'all' || p.category === currentCategoryFilter;
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                               (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -196,7 +199,7 @@ function openProductModalDetail(productId) {
     const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
     const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
     const product = products.find(p => p.id === productId);
-    if (!product) return;
+    if (!product || product.status === 'hidden') return;
 
     const catObj = categories.find(c => c.id === product.category);
     const catName = catObj ? catObj.name : product.category;
