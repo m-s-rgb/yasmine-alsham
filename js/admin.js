@@ -152,13 +152,14 @@ function loadAdminProducts() {
     if (!tbody) return;
 
     if (products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400">لا توجد منتجات مسجلة حالياً. استخدم زر "إضافة منتج جديد".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400">لا توجد منتجات مسجلة حالياً. استخدم زر "إضافة منتج جديد".</td></tr>`;
         return;
     }
 
     tbody.innerHTML = products.map(product => {
         const catObj = categories.find(c => c.id === product.category);
         const catName = catObj ? catObj.name : product.category;
+        const isHidden = product.status === 'hidden';
 
         return `
             <tr class="hover:bg-gray-50/80 transition">
@@ -168,7 +169,15 @@ function loadAdminProducts() {
                 <td class="p-4 font-bold text-brandGray-dark">${product.name}</td>
                 <td class="p-4"><span class="bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">${catName}</span></td>
                 <td class="p-4 font-black text-brandRed">$${parseFloat(product.price).toLocaleString()}</td>
+                <td class="p-4">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isHidden ? 'bg-red-100 text-brandRed' : 'bg-emerald-100 text-emerald-700'}">
+                        ${isHidden ? 'مخفي / خلصان' : 'متاح'}
+                    </span>
+                </td>
                 <td class="p-4 text-center space-x-2 space-x-reverse">
+                    <button onclick="toggleProductStatus(${product.id})" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-xl font-bold text-xs transition">
+                        ${isHidden ? 'إظهار' : 'إخفاء'}
+                    </button>
                     <button onclick="editProduct(${product.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-3 py-1.5 rounded-xl font-bold text-xs transition">
                         <i class="fa-solid fa-pen-to-square ml-1"></i> تعديل
                     </button>
@@ -179,6 +188,21 @@ function loadAdminProducts() {
             </tr>
         `;
     }).join('');
+}
+
+// Toggle Product Status (Active / Hidden)
+function toggleProductStatus(id) {
+    let products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
+    products = products.map(p => {
+        if (p.id === id) {
+            const newStatus = p.status === 'hidden' ? 'active' : 'hidden';
+            return { ...p, status: newStatus };
+        }
+        return p;
+    });
+    localStorage.setItem('yasmine_products', JSON.stringify(products));
+    loadAdminProducts();
+    showToast('تم تحديث حالة المنتج بنجاح');
 }
 
 // Load Categories Grid
@@ -243,6 +267,7 @@ function openProductModal() {
     document.getElementById('product-form').reset();
     document.getElementById('product-id').value = '';
     document.getElementById('product-image-existing').value = '';
+    document.getElementById('product-status').value = 'active';
     document.getElementById('product-modal-title').innerText = 'إضافة منتج جديد مع صورة';
     document.getElementById('product-admin-modal').classList.remove('hidden');
 }
@@ -260,6 +285,7 @@ function editProduct(id) {
     document.getElementById('product-name').value = product.name;
     document.getElementById('product-category').value = product.category;
     document.getElementById('product-price').value = product.price;
+    document.getElementById('product-status').value = product.status || 'active';
     document.getElementById('product-image-existing').value = product.image;
     document.getElementById('product-image-file').value = '';
     document.getElementById('product-desc').value = product.description || '';
@@ -274,6 +300,7 @@ function saveProduct(e) {
     const name = document.getElementById('product-name').value;
     const category = document.getElementById('product-category').value;
     const price = parseFloat(document.getElementById('product-price').value);
+    const status = document.getElementById('product-status').value;
     const description = document.getElementById('product-desc').value;
     const existingImage = document.getElementById('product-image-existing').value;
     const imageFile = document.getElementById('product-image-file').files[0];
@@ -283,11 +310,11 @@ function saveProduct(e) {
     const processSave = (imageUrl) => {
         if (idInput) {
             // Edit
-            products = products.map(p => p.id == idInput ? { ...p, name, category, price, image: imageUrl || existingImage || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop', description } : p);
+            products = products.map(p => p.id == idInput ? { ...p, name, category, price, status, image: imageUrl || existingImage || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop', description } : p);
         } else {
             // Add
             const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            products.push({ id: newId, name, category, price, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop', description });
+            products.push({ id: newId, name, category, price, status, image: imageUrl || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop', description });
         }
 
         localStorage.setItem('yasmine_products', JSON.stringify(products));
