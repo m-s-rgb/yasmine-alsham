@@ -4,10 +4,15 @@ import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, getDoc } fro
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 import { firebaseConfig } from "./firebase-config.js";
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+// Initialize Firebase safely
+let app, db, storage;
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    storage = getStorage(app);
+} catch (e) {
+    console.warn("Firebase initialization skipped or failed:", e);
+}
 
 // Default fallback data if Firebase is not yet configured or empty
 const DEFAULT_CATEGORIES = [
@@ -19,19 +24,21 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_SETTINGS = {
     name: 'ياسمين الشام',
     phone: '+963 980 980 165',
-    address: 'سوريا - درعا / الكرك الشرقي'
+    address: 'سوريا - درعا / الكرك الشرقي',
+    adminUser: 'admin',
+    adminPass: '123'
 };
 
 // Fetch Categories from Firestore
 export async function fetchCategories() {
     try {
+        if (!db) throw new Error("No DB");
         const querySnapshot = await getDocs(collection(db, "categories"));
         const cats = [];
         querySnapshot.forEach((docSnap) => {
             cats.push(docSnap.data());
         });
         if (cats.length === 0) {
-            // Seed defaults if empty
             for (const cat of DEFAULT_CATEGORIES) {
                 await setDoc(doc(db, "categories", cat.id), cat);
             }
@@ -39,32 +46,37 @@ export async function fetchCategories() {
         }
         return cats;
     } catch (e) {
-        console.warn("Firebase fetch categories error (using localStorage fallback):", e);
+        console.warn("Firebase fetch categories fallback to localStorage:", e);
         return JSON.parse(localStorage.getItem('yasmine_categories') || JSON.stringify(DEFAULT_CATEGORIES));
     }
 }
 
-// Save Category to Firestore
+// Save Category to Firestore (with localStorage sync fallback)
 export async function saveCategoryToCloud(cat) {
     try {
-        await setDoc(doc(db, "categories", cat.id), cat);
+        if (db) {
+            await setDoc(doc(db, "categories", cat.id), cat);
+        }
     } catch (e) {
-        console.error("Error saving category:", e);
+        console.error("Error saving category to cloud:", e);
     }
 }
 
 // Delete Category from Firestore
 export async function deleteCategoryFromCloud(catId) {
     try {
-        await deleteDoc(doc(db, "categories", catId));
+        if (db) {
+            await deleteDoc(doc(db, "categories", catId));
+        }
     } catch (e) {
-        console.error("Error deleting category:", e);
+        console.error("Error deleting category from cloud:", e);
     }
 }
 
 // Fetch Products from Firestore
 export async function fetchProducts() {
     try {
+        if (!db) throw new Error("No DB");
         const querySnapshot = await getDocs(collection(db, "products"));
         const prods = [];
         querySnapshot.forEach((docSnap) => {
@@ -72,7 +84,7 @@ export async function fetchProducts() {
         });
         return prods;
     } catch (e) {
-        console.warn("Firebase fetch products error (using localStorage fallback):", e);
+        console.warn("Firebase fetch products fallback to localStorage:", e);
         return JSON.parse(localStorage.getItem('yasmine_products') || '[]');
     }
 }
@@ -80,60 +92,76 @@ export async function fetchProducts() {
 // Save Product to Firestore
 export async function saveProductToCloud(product) {
     try {
-        await setDoc(doc(db, "products", String(product.id)), product);
+        if (db) {
+            await setDoc(doc(db, "products", String(product.id)), product);
+        }
     } catch (e) {
-        console.error("Error saving product:", e);
+        console.error("Error saving product to cloud:", e);
     }
 }
 
 // Delete Product from Firestore
 export async function deleteProductFromCloud(productId) {
     try {
-        await deleteDoc(doc(db, "products", String(productId)));
+        if (db) {
+            await deleteDoc(doc(db, "products", String(productId)));
+        }
     } catch (e) {
-        console.error("Error deleting product:", e);
+        console.error("Error deleting product from cloud:", e);
     }
 }
 
-// Fetch Store Settings
+// Fetch Store Settings & Admin Auth
 export async function fetchStoreSettings() {
     try {
+        if (!db) throw new Error("No DB");
         const docRef = doc(db, "settings", "store");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return docSnap.data();
+            const data = docSnap.data();
+            return {
+                name: data.name || DEFAULT_SETTINGS.name,
+                phone: data.phone || DEFAULT_SETTINGS.phone,
+                address: data.address || DEFAULT_SETTINGS.address,
+                adminUser: data.adminUser || DEFAULT_SETTINGS.adminUser,
+                adminPass: data.adminPass || DEFAULT_SETTINGS.adminPass
+            };
         } else {
             await setDoc(docRef, DEFAULT_SETTINGS);
             return DEFAULT_SETTINGS;
         }
     } catch (e) {
-        console.warn("Firebase fetch settings error:", e);
+        console.warn("Firebase fetch settings fallback to localStorage:", e);
         return JSON.parse(localStorage.getItem('yasmine_store_settings') || JSON.stringify(DEFAULT_SETTINGS));
     }
 }
 
-// Save Store Settings
+// Save Store Settings & Admin Auth to Firestore
 export async function saveStoreSettingsToCloud(settings) {
     try {
-        await setDoc(doc(db, "settings", "store"), settings);
+        if (db) {
+            await setDoc(doc(db, "settings", "store"), settings);
+        }
     } catch (e) {
-        console.error("Error saving settings:", e);
+        console.error("Error saving settings to cloud:", e);
     }
 }
 
-// Upload Image File to Firebase Storage
+// Upload Image File to Firebase Storage with reliable Base64 fallback
 export async function uploadImageToStorage(file, pathFolder = 'images') {
     try {
+        if (!storage || firebaseConfig.apiKey === "YOUR_API_KEY" || !firebaseConfig.apiKey) {
+            throw new Error("Firebase Storage not configured");
+        }
         const storageRef = ref(storage, `${pathFolder}/${Date.now()}_${file.name}`);
         const snapshot = await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(snapshot.ref);
         return downloadURL;
     } catch (e) {
-        console.error("Error uploading image to storage:", e);
-        // Fallback to Base64 reader if storage upload fails
+        console.warn("Using instant local Base64 image conversion:", e);
         return new Promise((resolve) => {
             const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
+            reader.onload = (event) => resolve(event.target.result);
             reader.readAsDataURL(file);
         });
     }
