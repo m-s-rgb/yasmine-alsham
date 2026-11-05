@@ -1,61 +1,36 @@
-// Default Categories & Store Settings
-const DEFAULT_CATEGORIES = [
-    { id: 'makeup', name: 'المكياج ومستحضرات التجميل', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop' },
-    { id: 'women', name: 'ملابس نسائية راقية', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop' },
-    { id: 'kids', name: 'ملابس أطفال عصرية', image: 'https://images.unsplash.com/photo-1503944583220-7eeec393dffb?q=80&w=800&auto=format&fit=crop' }
-];
+// Store Front Logic with Firebase Cloud Integration
+import { fetchCategories, fetchProducts, fetchStoreSettings } from "./firebase-service.js";
 
-const DEFAULT_SETTINGS = {
-    name: 'ياسمين الشام',
-    phone: '+963 980 980 165',
-    address: 'سوريا - درعا / الكرك الشرقي'
-};
-
-if (!localStorage.getItem('yasmine_categories')) {
-    localStorage.setItem('yasmine_categories', JSON.stringify(DEFAULT_CATEGORIES));
-}
-if (!localStorage.getItem('yasmine_products')) {
-    localStorage.setItem('yasmine_products', JSON.stringify([]));
-}
-if (!localStorage.getItem('yasmine_store_settings')) {
-    localStorage.setItem('yasmine_store_settings', JSON.stringify(DEFAULT_SETTINGS));
-}
-
-// Visitor Counter Logic (Clean & Real - Flush any legacy default > 1000)
-let visitorCount = parseInt(localStorage.getItem('yasmine_visitors') || '0');
-if (visitorCount > 1000) {
-    visitorCount = 1;
-    localStorage.setItem('yasmine_visitors', visitorCount);
-}
-if (!sessionStorage.getItem('visited_session')) {
-    visitorCount++;
-    localStorage.setItem('yasmine_visitors', visitorCount);
-    sessionStorage.setItem('visited_session', 'true');
-}
-
-// State
 let currentCategoryFilter = 'all';
+let cachedCategories = [];
+let cachedProducts = [];
 
 // Load Store Data on Startup
-document.addEventListener('DOMContentLoaded', () => {
-    applyStoreSettings();
-    renderCategories();
-    renderCategoryTabs();
-    renderProducts();
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Load Settings
+    const settings = await fetchStoreSettings();
+    applyStoreSettings(settings);
+
+    // 2. Load Categories
+    cachedCategories = await fetchCategories();
+    renderCategories(cachedCategories);
+    renderCategoryTabs(cachedCategories);
+
+    // 3. Load Products
+    cachedProducts = await fetchProducts();
+    renderProducts(cachedProducts, cachedCategories);
 
     // Search input listener
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            renderProducts(e.target.value);
+            renderProducts(cachedProducts, cachedCategories, e.target.value);
         });
     }
 });
 
 // Apply Store Dynamic Settings (Name, Phone, Address)
-function applyStoreSettings() {
-    const settings = JSON.parse(localStorage.getItem('yasmine_store_settings') || JSON.stringify(DEFAULT_SETTINGS));
-
+function applyStoreSettings(s) {
     const phoneTop = document.getElementById('store-phone-top');
     const phoneFooter = document.getElementById('store-phone-footer');
     const storeNameHeader = document.getElementById('store-name-header');
@@ -64,18 +39,17 @@ function applyStoreSettings() {
     const storeNameCopy = document.getElementById('store-name-copy');
     const storeAddress = document.getElementById('store-address');
 
-    if (phoneTop) phoneTop.innerText = settings.phone;
-    if (phoneFooter) phoneFooter.innerText = settings.phone;
-    if (storeNameHeader) storeNameHeader.innerText = settings.name;
-    if (storeNameHero) storeNameHero.innerText = settings.name;
-    if (storeNameFooter) storeNameFooter.innerText = settings.name;
-    if (storeNameCopy) storeNameCopy.innerText = settings.name;
-    if (storeAddress) storeAddress.innerText = settings.address;
+    if (phoneTop) phoneTop.innerText = s.phone;
+    if (phoneFooter) phoneFooter.innerText = s.phone;
+    if (storeNameHeader) storeNameHeader.innerText = s.name;
+    if (storeNameHero) storeNameHero.innerText = s.name;
+    if (storeNameFooter) storeNameFooter.innerText = s.name;
+    if (storeNameCopy) storeNameCopy.innerText = s.name;
+    if (storeAddress) storeAddress.innerText = s.address;
 }
 
 // Render Categories Grid on Homepage
-function renderCategories() {
-    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+function renderCategories(categories) {
     const container = document.getElementById('categories-grid');
     if (!container) return;
 
@@ -90,7 +64,7 @@ function renderCategories() {
     }
 
     container.innerHTML = categories.map(cat => `
-        <div onclick="filterCategoryByClick('${cat.id}')" class="group relative bg-gray-900 rounded-2xl overflow-hidden shadow-md cursor-pointer h-64 transform transition hover:-translate-y-1">
+        <div onclick="window.filterCategoryByClick('${cat.id}')" class="group relative bg-gray-900 rounded-2xl overflow-hidden shadow-md cursor-pointer h-64 transform transition hover:-translate-y-1">
             <img src="${cat.image}" alt="${cat.name}" class="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
                 <h4 class="text-white text-xl font-black mb-1">${cat.name}</h4>
@@ -104,15 +78,14 @@ function renderCategories() {
 }
 
 // Render Category Tabs
-function renderCategoryTabs() {
-    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+function renderCategoryTabs(categories) {
     const tabsContainer = document.getElementById('category-tabs');
     if (!tabsContainer) return;
 
-    let html = `<button onclick="filterCategory('all')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === 'all' ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">الكل</button>`;
+    let html = `<button onclick="window.filterCategory('all')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === 'all' ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">الكل</button>`;
 
     html += categories.map(cat => `
-        <button onclick="filterCategory('${cat.id}')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === cat.id ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">
+        <button onclick="window.filterCategory('${cat.id}')" class="category-tab px-4 py-2 rounded-xl text-xs font-bold ${currentCategoryFilter === cat.id ? 'bg-brandRed text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition">
             ${cat.name}
         </button>
     `).join('');
@@ -121,31 +94,27 @@ function renderCategoryTabs() {
 }
 
 // Filter Category
-function filterCategory(catId) {
+window.filterCategory = function(catId) {
     currentCategoryFilter = catId;
-    renderCategoryTabs();
-    renderProducts();
-}
+    renderCategoryTabs(cachedCategories);
+    renderProducts(cachedProducts, cachedCategories);
+};
 
-function filterCategoryByClick(catId) {
-    filterCategory(catId);
+window.filterCategoryByClick = function(catId) {
+    window.filterCategory(catId);
     const section = document.getElementById('products-section');
     if (section) {
         section.scrollIntoView({ behavior: 'smooth' });
     }
-}
+};
 
 // Render Products Grid (Browse Only - Hiding hidden/sold-out products)
-function renderProducts(searchQuery = '') {
-    const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
-    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
+function renderProducts(products, categories, searchQuery = '') {
     const container = document.getElementById('products-grid');
     if (!container) return;
 
     const filtered = products.filter(p => {
-        // Skip hidden/finished products for customers
         if (p.status === 'hidden') return false;
-
         const matchesCategory = currentCategoryFilter === 'all' || p.category === currentCategoryFilter;
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                               (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -167,7 +136,7 @@ function renderProducts(searchQuery = '') {
         const catName = catObj ? catObj.name : product.category;
 
         return `
-            <div onclick="openProductModalDetail(${product.id})" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group transform transition hover:-translate-y-1 hover:shadow-xl cursor-pointer">
+            <div onclick="window.openProductModalDetail(${product.id})" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group transform transition hover:-translate-y-1 hover:shadow-xl cursor-pointer">
                 <div class="relative h-56 overflow-hidden bg-gray-100">
                     <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     <span class="absolute top-3 right-3 bg-brandGray-dark/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
@@ -195,13 +164,11 @@ function renderProducts(searchQuery = '') {
 }
 
 // Product Details Modal
-function openProductModalDetail(productId) {
-    const products = JSON.parse(localStorage.getItem('yasmine_products') || '[]');
-    const categories = JSON.parse(localStorage.getItem('yasmine_categories') || '[]');
-    const product = products.find(p => p.id === productId);
+window.openProductModalDetail = function(productId) {
+    const product = cachedProducts.find(p => p.id === productId);
     if (!product || product.status === 'hidden') return;
 
-    const catObj = categories.find(c => c.id === product.category);
+    const catObj = cachedCategories.find(c => c.id === product.category);
     const catName = catObj ? catObj.name : product.category;
 
     const modal = document.getElementById('product-modal');
@@ -226,9 +193,9 @@ function openProductModalDetail(productId) {
     `;
 
     modal.classList.remove('hidden');
-}
+};
 
-function closeProductModal() {
+window.closeProductModal = function() {
     const modal = document.getElementById('product-modal');
     if (modal) modal.classList.add('hidden');
-}
+};
