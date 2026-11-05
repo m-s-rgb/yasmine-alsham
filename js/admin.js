@@ -371,8 +371,11 @@ function closeProductModal() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'app.js';
+    document.body.appendChild(a);
     a.click();
-    showToast('تم تصدير ملف app.js المحدث بنجاح! ارفعه إلى جيت هب');
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('تم تصدير ملف app.js بنجاح!');
 }
 
 // Load Stats
