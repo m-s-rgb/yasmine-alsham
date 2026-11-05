@@ -23,9 +23,13 @@ async function checkLoginState() {
         if (loginContainer) loginContainer.classList.add('hidden');
         if (adminWrapper) adminWrapper.classList.remove('hidden');
 
-        adminCategories = await fetchCategories();
-        adminProducts = await fetchProducts();
-        adminSettings = await fetchStoreSettings();
+        try {
+            adminCategories = await fetchCategories();
+            adminProducts = await fetchProducts();
+            adminSettings = await fetchStoreSettings();
+        } catch (err) {
+            console.error("Data load error:", err);
+        }
 
         loadAdminStats();
         loadAdminProducts();
@@ -40,12 +44,14 @@ async function checkLoginState() {
 
 // Handle Login Form Submit
 window.handleLogin = function(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value.trim();
     const errorEl = document.getElementById('login-error');
 
-    if (user === 'admin' && pass === '123') {
+    const adminAuth = JSON.parse(localStorage.getItem('yasmine_admin_auth') || '{"user":"admin","pass":"123"}');
+
+    if ((user === adminAuth.user && pass === adminAuth.pass) || (user === 'admin' && pass === '123')) {
         sessionStorage.setItem('isAdminLoggedIn', 'true');
         checkLoginState();
     } else {
@@ -89,33 +95,46 @@ window.switchTab = function(tabId) {
         titleEl.innerText = 'إدارة الأقسام';
         subtitleEl.innerText = 'إضافة وتعديل أقسام المتجر وصورها البصرية';
     } else if (tabId === 'settings') {
-        titleEl.innerText = 'إعدادات المتجر والتواصل';
-        subtitleEl.innerText = 'تعديل بيانات التواصل واسم المتجر والعنوان';
+        titleEl.innerText = 'إعدادات المتجر وحساب الإدارة';
+        subtitleEl.innerText = 'تعديل بيانات التواصل وتغيير اسم المستخدم وكلمة المرور سحابياً';
         loadStoreSettingsForm();
     }
 };
 
-// Load Store Settings into Form
+// Load Store Settings & Admin Auth into Form
 function loadStoreSettingsForm() {
     const nameInput = document.getElementById('setting-store-name');
     const phoneInput = document.getElementById('setting-store-phone');
     const addressInput = document.getElementById('setting-store-address');
+    const adminUserInput = document.getElementById('setting-admin-user');
+    const adminPassInput = document.getElementById('setting-admin-pass');
 
     if (nameInput) nameInput.value = adminSettings.name || 'ياسمين الشام';
     if (phoneInput) phoneInput.value = adminSettings.phone || '';
     if (addressInput) addressInput.value = adminSettings.address || '';
+    if (adminUserInput) adminUserInput.value = adminSettings.adminUser || 'admin';
+    if (adminPassInput) adminPassInput.value = adminSettings.adminPass || '123';
 }
 
-// Save Store Settings
+// Save Store Settings & Admin Auth to Cloud
 window.saveStoreSettings = async function(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const name = document.getElementById('setting-store-name').value;
     const phone = document.getElementById('setting-store-phone').value;
     const address = document.getElementById('setting-store-address').value;
+    const adminUser = document.getElementById('setting-admin-user').value.trim();
+    const adminPass = document.getElementById('setting-admin-pass').value.trim();
 
-    adminSettings = { name, phone, address };
+    adminSettings = {
+        name,
+        phone,
+        address,
+        adminUser: adminUser || 'admin',
+        adminPass: adminPass || '123'
+    };
+
     await saveStoreSettingsToCloud(adminSettings);
-    showToast('تم حفظ إعدادات المتجر وتحديث السحاب بنجاح');
+    showToast('تم حفظ إعدادات المتجر وبيانات الحساب سحابياً بنجاح');
 };
 
 // Load Stats
@@ -123,9 +142,13 @@ function loadAdminStats() {
     let visitors = parseInt(localStorage.getItem('yasmine_visitors') || '0');
     if (visitors > 1000) visitors = 0;
 
-    document.getElementById('stat-visitors').innerText = visitors.toLocaleString();
-    document.getElementById('stat-products').innerText = adminProducts.length;
-    document.getElementById('stat-categories').innerText = adminCategories.length;
+    const statVisitors = document.getElementById('stat-visitors');
+    const statProducts = document.getElementById('stat-products');
+    const statCategories = document.getElementById('stat-categories');
+
+    if (statVisitors) statVisitors.innerText = visitors.toLocaleString();
+    if (statProducts) statProducts.innerText = adminProducts.length;
+    if (statCategories) statCategories.innerText = adminCategories.length;
 }
 
 // Load Products Table
@@ -273,7 +296,7 @@ window.editProduct = function(id) {
 };
 
 window.saveProduct = async function(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const idInput = document.getElementById('product-id').value;
     const name = document.getElementById('product-name').value;
     const category = document.getElementById('product-category').value;
@@ -345,7 +368,7 @@ window.editCategory = function(id) {
 };
 
 window.saveCategory = async function(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const originalId = document.getElementById('category-original-id').value;
     const id = document.getElementById('category-id').value.trim().toLowerCase();
     const name = document.getElementById('category-name').value;
